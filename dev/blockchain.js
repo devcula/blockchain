@@ -1,10 +1,14 @@
 const Block = require('./block');
 const Transaction = require('./transaction');
+const crypto = require('crypto');
 
 class Blockchain{
     constructor(){
         this.chain = [];
         this.pendingTransactions = [];
+
+        //Create a genesis block
+        this.createNewBlock(0, '0', '0');
     }
 
     createNewBlock(nonce, previousBlockHash, hash){
@@ -30,6 +34,22 @@ class Blockchain{
         // return this.getLastBlock().index + 1;
         //Using below syntax because it's basically the same thing
         return this.chain.length + 1;
+    }
+
+    hashBlock(previousBlockHash, currentBlockData, nonce){
+        const stringData = previousBlockHash + String(nonce) + JSON.stringify(currentBlockData);
+        return crypto.createHash('sha256').update(stringData).digest('hex');
+    }
+
+    mineBlock(previousBlockHash, currentBlockData){
+        let nonce = 0;
+        while(true){
+            const hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+            if(hash.startsWith("0000")){
+                return nonce;
+            }
+            nonce++;
+        }
     }
 }
 
