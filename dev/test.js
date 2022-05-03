@@ -1,6 +1,10 @@
-const { Blockchain } = require("./blockchain");
+const Blockchain = require("./blockchain");
 
-let blockchain = new Blockchain();
-blockchain.createNewBlock("nonce", "previousHash", "hash");
-
-console.log(JSON.stringify(blockchain));
+let bitcoin = new Blockchain();
+bitcoin.createNewBlock(54211211, "AJSHH123H137813N", "HH32UIT379DUA");
+bitcoin.createNewTransaction("5000", "Abhinav", "Manoj");
+bitcoin.createNewTransaction("500", "Abhinav", "Manoj");
+bitcoin.createNewTransaction("200", "Abhinav", "Manoj");
+bitcoin.createNewBlock(878515454, "1UUH2JEWY78U23ASSD", "IUOIYGUVJB32312JAS");
+bitcoin.createNewTransaction("500", "Abhishek", "Sanjay");
+console.log(bitcoin);
