@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon --watch dev -e js dev/api.js",
-    "start": "node dev/api.js"
+    "test": "nodemon --watch dev -e js dev/api.js 3000",
+    "start": "node dev/api.js 3000"
   },
   "author": "",
   "license": "ISC",

@@ -2,9 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const uuid = require('uuid');
+const port = process.argv[2];
 
 const nodeAddress = uuid.v1().split("-").join("");
-// console.log(nodeAddress);
 
 const Blockchain = require("./blockchain");
 
@@ -33,7 +33,7 @@ app.post("/transaction", function (req, res) {
 app.get("/mine", function (req, res) {
     const lastBlock = newcoin.getLastBlock();
     const previousBlockHash = lastBlock.hash;
-    
+
     //Reward for mining
     newcoin.createNewTransaction(12.5, "REWARD_SERVER", nodeAddress);
 
@@ -46,6 +46,6 @@ app.get("/mine", function (req, res) {
     res.status(200).json(newBlock);
 });
 
-app.listen(3000, () => {
-    console.log("Server listening on port 3000");
+app.listen(port, () => {
+    console.log(`Node ${nodeAddress} listening on port ${port}...`);
 });
