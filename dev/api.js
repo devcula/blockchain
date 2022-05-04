@@ -33,14 +33,16 @@ app.post("/transaction", function (req, res) {
 app.get("/mine", function (req, res) {
     const lastBlock = newcoin.getLastBlock();
     const previousBlockHash = lastBlock.hash;
+    
+    //Reward for mining
+    newcoin.createNewTransaction(12.5, "REWARD_SERVER", nodeAddress);
+
     const currentBlockData = {
         transactions: newcoin.pendingTransactions
     }
 
     const { nonce, hash } = newcoin.mineBlock(previousBlockHash, currentBlockData);
     const newBlock = newcoin.createNewBlock(nonce, previousBlockHash, hash);
-    //Reward for mining
-    newcoin.createNewTransaction(12.5, "REWARD_SERVER", nodeAddress);
     res.status(200).json(newBlock);
 });
 
