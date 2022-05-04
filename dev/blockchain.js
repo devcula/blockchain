@@ -46,7 +46,7 @@ class Blockchain{
         while(true){
             const hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
             if(hash.startsWith("0000")){
-                return nonce;
+                return { nonce, hash };
             }
             nonce++;
         }
