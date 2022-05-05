@@ -1,12 +1,15 @@
 const Block = require('./block');
 const Transaction = require('./transaction');
 const crypto = require('crypto');
+const currentNodeHost = process.argv[3];
+const currentNodePort = process.argv[2];
 
 class Blockchain{
     constructor(){
         this.chain = [];
         this.pendingTransactions = [];
-
+        this.currentNodeUrl = `${currentNodeHost}:${currentNodePort}`;
+        this.networkNodes = [];
         //Create a genesis block
         this.createNewBlock(0, '0', '0');
     }

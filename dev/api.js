@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const uuid = require('uuid');
+const axios = require('axios');
 const port = process.argv[2];
 
 const nodeAddress = uuid.v1().split("-").join("");
@@ -44,6 +45,93 @@ app.get("/mine", function (req, res) {
     const { nonce, hash } = newcoin.mineBlock(previousBlockHash, currentBlockData);
     const newBlock = newcoin.createNewBlock(nonce, previousBlockHash, hash);
     res.status(200).json(newBlock);
+});
+
+//register a node and broadcast it to the network
+app.post("/register-and-broadcast-node", async function(req, res){
+    const newNodeUrl = req.body.url;
+    if(!newNodeUrl){
+        return res.status(400).send("url is mandatory");
+    }
+    if (!newcoin.networkNodes.includes(newNodeUrl) && newcoin.currentNodeUrl !== newNodeUrl){
+        //Register the URL into current node
+        newcoin.networkNodes.push(newNodeUrl);
+    }
+
+    //Broadcast the URL to other nodes
+    const broadcastPromises = newcoin.networkNodes.map(nodeUrl => {
+        return new Promise(async resolve => {
+            try{
+                const config = {
+                    url: `${nodeUrl}/register-node`,
+                    method: "POST",
+                    data: {
+                        url: newNodeUrl
+                    }
+                }
+                let response = await axios(config);
+                console.log(response.data, `Registered ${newNodeUrl} to node ${nodeUrl}..`);
+            }
+            catch(err){
+                console.log(err.message, `Error while registering ${newNodeUrl} to node ${nodeUrl}..`);
+            }
+            return resolve();
+        });
+    });
+
+    await Promise.all(broadcastPromises);
+    //Broadcast done. Now need to register the existing nodes to the new node using bulk endpoint
+    const config = {
+        url: `${newNodeUrl}/register-nodes-bulk`,
+        method: "POST",
+        data: {
+            urls: [...newcoin.networkNodes, newcoin.currentNodeUrl]
+        }
+    }
+    try{
+        let response = await axios(config);
+        console.log(response.data, `Registered bulk nodes in the new node : `);
+    }
+    catch(err){
+        console.log(err.message, `Error during bulk registration of nodes to the new node ${newNodeUrl}..`);
+    }
+    res.status(200).send("Register and broadcast completed...");
+});
+
+//just register a node to the network without broadcasting it
+app.post("/register-node", function(req, res){
+    const newNodeUrl = req.body.url;
+    if (!newNodeUrl) {
+        return res.status(400).send("url is mandatory");
+    }
+    if (!newcoin.networkNodes.includes(newNodeUrl) && newcoin.currentNodeUrl !== newNodeUrl) {
+        //Register the URL into current node
+        newcoin.networkNodes.push(newNodeUrl);
+    }
+    res.status(200).send(`${newNodeUrl} registered..`);
+});
+
+app.post("/register-nodes-bulk", function (req, res) {
+    let newNodes = req.body.urls;
+    if(typeof newNodes === "string"){
+        try{
+            newNodes = JSON.parse(newNodes);    
+        }
+        catch(err){}
+    }
+
+    if (!newNodes || !Array.isArray(newNodes)) {
+        return res.status(400).send("urls is mandatory parameter and should be an array..");
+    }
+
+    newNodes.forEach(newNodeUrl => {
+        if (!newcoin.networkNodes.includes(newNodeUrl) && newcoin.currentNodeUrl !== newNodeUrl) {
+            //Register the URL into current node
+            newcoin.networkNodes.push(newNodeUrl);
+        }
+    });
+    
+    res.status(200).send(`Bulk registrations successful..`);
 });
 
 app.listen(port, () => {
