@@ -49,6 +49,7 @@ app.get("/mine", function (req, res) {
 
 //register a node and broadcast it to the network
 app.post("/register-and-broadcast-node", async function(req, res){
+    console.log(`Received request for register and broadcast node..`);
     const newNodeUrl = req.body.url;
     if(!newNodeUrl){
         return res.status(400).send("url is mandatory");
@@ -56,6 +57,7 @@ app.post("/register-and-broadcast-node", async function(req, res){
     if (!newcoin.networkNodes.includes(newNodeUrl) && newcoin.currentNodeUrl !== newNodeUrl){
         //Register the URL into current node
         newcoin.networkNodes.push(newNodeUrl);
+        console.log(`Registered ${newNodeUrl} ..`);
     }
 
     //Broadcast the URL to other nodes
@@ -69,11 +71,11 @@ app.post("/register-and-broadcast-node", async function(req, res){
                         url: newNodeUrl
                     }
                 }
-                let response = await axios(config);
-                console.log(response.data, `Registered ${newNodeUrl} to node ${nodeUrl}..`);
+                await axios(config);
+                console.log(`Broadcasted ${newNodeUrl} to node ${nodeUrl}..`);
             }
             catch(err){
-                console.log(err.message, `Error while registering ${newNodeUrl} to node ${nodeUrl}..`);
+                console.log(`Error while broadcasting ${newNodeUrl} to node ${nodeUrl}..`, err.message);
             }
             return resolve();
         });
@@ -89,17 +91,18 @@ app.post("/register-and-broadcast-node", async function(req, res){
         }
     }
     try{
-        let response = await axios(config);
-        console.log(response.data, `Registered bulk nodes in the new node : `);
+        await axios(config);
+        console.log(`Bulk registered nodes in the new node ${newNodeUrl}..`);
     }
     catch(err){
-        console.log(err.message, `Error during bulk registration of nodes to the new node ${newNodeUrl}..`);
+        console.log(`Error during bulk registration of nodes to the new node ${newNodeUrl}..`, err.message);
     }
     res.status(200).send("Register and broadcast completed...");
 });
 
 //just register a node to the network without broadcasting it
 app.post("/register-node", function(req, res){
+    console.log("Received request for node registration..");
     const newNodeUrl = req.body.url;
     if (!newNodeUrl) {
         return res.status(400).send("url is mandatory");
@@ -107,11 +110,13 @@ app.post("/register-node", function(req, res){
     if (!newcoin.networkNodes.includes(newNodeUrl) && newcoin.currentNodeUrl !== newNodeUrl) {
         //Register the URL into current node
         newcoin.networkNodes.push(newNodeUrl);
+        console.log(`Registered ${newNodeUrl} ..`);
     }
     res.status(200).send(`${newNodeUrl} registered..`);
 });
 
 app.post("/register-nodes-bulk", function (req, res) {
+    console.log("Received request for bulk registration..");
     let newNodes = req.body.urls;
     if(typeof newNodes === "string"){
         try{
@@ -128,6 +133,7 @@ app.post("/register-nodes-bulk", function (req, res) {
         if (!newcoin.networkNodes.includes(newNodeUrl) && newcoin.currentNodeUrl !== newNodeUrl) {
             //Register the URL into current node
             newcoin.networkNodes.push(newNodeUrl);
+            console.log(`Registered ${newNodeUrl} ..`);
         }
     });
     
