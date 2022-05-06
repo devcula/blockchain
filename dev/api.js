@@ -64,12 +64,10 @@ app.post("/transaction/broadcast", async function(req, res){
     res.status(200).send("Transaction created and broadcasted successfully..");
 });
 
-app.get("/mine", function (req, res) {
+app.get("/mine", async function (req, res) {
+    console.log("Received request at mine endpoint..");
     const lastBlock = newcoin.getLastBlock();
     const previousBlockHash = lastBlock.hash;
-
-    //Reward for mining
-    newcoin.createNewTransaction(12.5, "REWARD_SERVER", nodeAddress);
 
     const currentBlockData = {
         transactions: newcoin.pendingTransactions
@@ -77,7 +75,66 @@ app.get("/mine", function (req, res) {
 
     const { nonce, hash } = newcoin.mineBlock(previousBlockHash, currentBlockData);
     const newBlock = newcoin.createNewBlock(nonce, previousBlockHash, hash);
+    console.log("New block mined..");
+
+    const broadcastPromises = newcoin.networkNodes.map(nodeUrl => {
+        return new Promise(async resolve => {
+            try {
+                const config = {
+                    url: `${nodeUrl}/add-new-block`,
+                    method: "POST",
+                    data: {.newBlock }
+                }
+                await axios(config);
+                console.log(`Block broadcasted to ${nodeUrl}..`);
+            }
+            catch (err) {
+                console.log(`Error broadcasting block to ${nodeUrl}..`);
+            }
+            return resolve();
+        });
+    });
+    await Promise.all(broadcastPromises);
+
+    //Reward for mining
+    try{
+        const config = {
+            url: `${newcoin.currentNodeUrl}/transaction/broadcast`,
+            method: "POST",
+            data: {
+                amount: 12.5,
+                sender: "REWARD_SERVER",
+                recipient: nodeAddress
+            }
+        }
+        await axios(config);
+        console.log("Reward transaction created and broadcasted successfully..");
+    }
+    catch(err){
+        console.log("Failed to create and broadcast reward transaction..");
+    }
+    
     res.status(200).json(newBlock);
+});
+
+app.post("/add-new-block", function(req, res) {
+    console.log("Received request at add new block endpoint..");
+    const {newBlock} = req.body;
+    if(!newBlock){
+        return res.status(400).send("Invalid request..");
+    }
+    //Verify the new block with our last block
+    const lastBlock = newcoin.getLastBlock();
+    const isValidHash = lastBlock.hash === newBlock.previousBlockHash;
+    const isValidIndex = lastBlock.index + 1 === newBlock.index;
+    
+    if(isValidHash && isValidIndex){
+        newcoin.chain.push(newBlock);
+        console.log("Received block added to blockchain..");
+        newcoin.pendingTransactions = [];
+        return res.status(200).send("New Block received, verified and added to the chain..");
+    }
+    return res.status(500).send("New block rejected..");
 });
 
 //register a node and broadcast it to the network
