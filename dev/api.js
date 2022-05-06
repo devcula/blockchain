@@ -23,12 +23,45 @@ app.get("/blockchain", function(req, res){
 });
 
 app.post("/transaction", function (req, res) {
-    const { amount, sender, recipient } = req.body;
-    if(!sender || !recipient || isNaN(amount)){
+    console.log(`Request received at transaction node..`);
+    const newTransaction = req.body;
+    if (!newTransaction.sender || !newTransaction.recipient || !newTransaction.transactionId || isNaN(newTransaction.amount)){
         return res.status(400).send("Invalid request");
     }
-    const blockIndex = newcoin.createNewTransaction(Number(amount), sender, recipient);
-    res.status(200).send(`Transaction will be added in block ${blockIndex}.`);
+    const blockIndex = newcoin.addTransaction(newTransaction);
+    console.log("Transaction added..");
+
+    res.status(200).send(`Transaction will be added in block ${blockIndex}..`);
+});
+
+app.post("/transaction/broadcast", async function(req, res){
+    console.log(`Request received at transaction/broadcast node..`);
+    const { amount, sender, recipient } = req.body;
+    if (!sender || !recipient || isNaN(amount)) {
+        return res.status(400).send("Invalid request");
+    }
+    let newTransaction = newcoin.createNewTransaction(Number(amount), sender, recipient);
+    newcoin.addTransaction(newTransaction);
+    console.log("Transaction added..");
+    const broadcastPromises = newcoin.networkNodes.map(nodeUrl => {
+        return new Promise(async resolve => {
+            try{
+                const config = {
+                    url: `${nodeUrl}/transaction`,
+                    method: "POST",
+                    data: newTransaction
+                }
+                await axios(config);
+                console.log(`Transaction broadcasted to ${nodeUrl}..`);
+            }
+            catch(err){
+                console.log(`Error broadcasting transaction to ${nodeUrl}..`);
+            }
+            return resolve();
+        });
+    });
+    await Promise.all(broadcastPromises);
+    res.status(200).send("Transaction created and broadcasted successfully..");
 });
 
 app.get("/mine", function (req, res) {

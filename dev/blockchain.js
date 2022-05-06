@@ -29,13 +29,17 @@ class Blockchain{
     }
 
     createNewTransaction(amount, sender, recipient){
-        const newTransaction = new Transaction(amount, sender, recipient);
-        this.pendingTransactions.push(newTransaction);
+        return new Transaction(amount, sender, recipient);
+    }
+
+    addTransaction(transaction){
+        this.pendingTransactions.push(transaction);
 
         //I am assuming that we are trying to return the index of the block of which this transaction is going to be part of
         //When we create first transaction, this.getLastBlock() will return undefined, so commenting below line.
         // return this.getLastBlock().index + 1;
         //Using below syntax because it's basically the same thing
+        // return this.chain.length + 1;
         return this.chain.length + 1;
     }
 
