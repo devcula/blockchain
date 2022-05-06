@@ -44,12 +44,15 @@ class Blockchain{
     }
 
     hashBlock(previousBlockHash, currentBlockData, nonce){
-        const stringData = previousBlockHash + String(nonce) + JSON.stringify(currentBlockData);
+        const stringData = previousBlockHash + String(nonce) + currentBlockData;
         return crypto.createHash('sha256').update(stringData).digest('hex');
     }
 
     mineBlock(previousBlockHash, currentBlockData){
         let nonce = 0;
+        if(typeof currentBlockData !== "string"){
+            currentBlockData = JSON.stringify(currentBlockData);
+        }
         while(true){
             const hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
             if(hash.startsWith("0000")){
@@ -57,6 +60,44 @@ class Blockchain{
             }
             nonce++;
         }
+    }
+
+    isBlockchainValid(blockchain){
+        if(!Array.isArray(blockchain) || blockchain.length === 0){
+            return false;
+        }
+
+        //Verify genesis block
+        const genesisBlock = blockchain[0];
+        if( genesisBlock.previousBlockHash !== "0"
+        || genesisBlock.hash !== "0"
+        || genesisBlock.nonce !== 0
+        || genesisBlock.transactions.length !== 0 
+        ){
+            console.log("Invalid genesis block..");
+            return false;
+        }
+
+        //Now verify the entire chain
+        for(let i = 1; i < blockchain.length; i++){
+            const currentBlock = blockchain[i];
+            const previousBlock = blockchain[i - 1];
+            if(currentBlock.previousBlockHash !== previousBlock.hash){
+                //Chain is not valid
+                console.log("Invalid previous hash match..");
+                return false;
+            }
+            const currentBlockData = {
+                transactions: currentBlock.transactions //It should be same format and value as used while mining
+            }
+            const currentBlockHash = this.hashBlock(previousBlock.hash, JSON.stringify(currentBlockData), currentBlock.nonce);
+            if(!currentBlockHash.startsWith("0000")){
+                console.log("Incorrect block hash..");
+                return false;
+            }
+        }
+        //Chain is valid
+        return true;
     }
 }
 

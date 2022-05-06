@@ -14,10 +14,6 @@ const newcoin = new Blockchain();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/", function(req, res) {
-    res.send("Hello world!");
-});
-
 app.get("/blockchain", function(req, res){
     res.send(newcoin);
 });
@@ -83,7 +79,7 @@ app.get("/mine", async function (req, res) {
                 const config = {
                     url: `${nodeUrl}/add-new-block`,
                     method: "POST",
-                    data: {.newBlock }
+                    data: {newBlock }
                 }
                 await axios(config);
                 console.log(`Block broadcasted to ${nodeUrl}..`);
@@ -228,6 +224,51 @@ app.post("/register-nodes-bulk", function (req, res) {
     });
     
     res.status(200).send(`Bulk registrations successful..`);
+});
+
+app.get("/consensus", async function(req, res){
+    console.log("Received request at the consensus endpoint..");
+    const consensusPromises = newcoin.networkNodes.map(nodeUrl => {
+        return new Promise(async resolve => {
+            try {
+                const config = {
+                    url: `${nodeUrl}/blockchain`,
+                    method: "GET"
+                }
+                let response = await axios(config);
+                console.log(`Fetched blockchain from ${nodeUrl}..`);
+                return resolve(response.data);
+            }
+            catch (err) {
+                console.log(`Error while fetching blockchain from ${nodeUrl}`, err.message);
+            }
+            return resolve({});
+        });
+    });
+
+    const blockchains = await Promise.all(consensusPromises);
+    const currentChainLength = newcoin.chain.length;
+    let maxChainLength = currentChainLength, newLongestChain = null, newPendingTransactions = null;
+    blockchains.forEach(blockchain => {
+        if(blockchain?.chain?.length > maxChainLength){
+            maxChainLength = blockchain.chain.length;
+            newLongestChain = blockchain.chain;
+            newPendingTransactions = blockchain.pendingTransactions;
+        }
+    });
+    if(newLongestChain && newcoin.isBlockchainValid(newLongestChain)){
+        newcoin.chain = newLongestChain;
+        newcoin.pendingTransactions = newPendingTransactions;
+        console.log("Current chain has been replaced with the longest chain in the network..");
+        return res.status(200).send("Current chain has been replaced with the longest chain in the network..");
+    }
+    console.log("Current chain has not been replaced..");
+    return res.status(200).send("Current chain has not been replaced..");
+});
+
+app.get("/validate-chain", function(req, res){
+    //Just for testing purposes
+    res.status(200).send(newcoin.isBlockchainValid(newcoin.chain));
 });
 
 app.listen(port, () => {
