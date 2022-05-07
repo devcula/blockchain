@@ -1,4 +1,4 @@
-const Blockchain = require("./blockchain");
+const Blockchain = require("../types/Blockchain");
 
 let bitcoin = new Blockchain();
 bitcoin.createNewBlock(54211211, "AJSHH123H137813N", "HH32UIT379DUA");

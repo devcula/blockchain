@@ -7,7 +7,7 @@ const port = process.argv[2];
 
 const nodeAddress = uuid.v1().split("-").join("");
 
-const Blockchain = require("./blockchain");
+const Blockchain = require("../types/Blockchain");
 
 const newcoin = new Blockchain();
 
@@ -109,7 +109,7 @@ app.get("/mine", async function (req, res) {
     catch(err){
         console.log("Failed to create and broadcast reward transaction..");
     }
-    
+
     res.status(200).json(newBlock);
 });
 
@@ -123,7 +123,7 @@ app.post("/add-new-block", function(req, res) {
     const lastBlock = newcoin.getLastBlock();
     const isValidHash = lastBlock.hash === newBlock.previousBlockHash;
     const isValidIndex = lastBlock.index + 1 === newBlock.index;
-    
+
     if(isValidHash && isValidIndex){
         newcoin.chain.push(newBlock);
         console.log("Received block added to blockchain..");
@@ -206,7 +206,7 @@ app.post("/register-nodes-bulk", function (req, res) {
     let newNodes = req.body.urls;
     if(typeof newNodes === "string"){
         try{
-            newNodes = JSON.parse(newNodes);    
+            newNodes = JSON.parse(newNodes);
         }
         catch(err){}
     }
@@ -222,7 +222,7 @@ app.post("/register-nodes-bulk", function (req, res) {
             console.log(`Registered ${newNodeUrl} ..`);
         }
     });
-    
+
     res.status(200).send(`Bulk registrations successful..`);
 });
 

@@ -1,5 +1,5 @@
-const Block = require('./block');
-const Transaction = require('./transaction');
+const Block = require('./Block');
+const Transaction = require('./Transaction');
 const crypto = require('crypto');
 const currentNodeHost = process.argv[3];
 const currentNodePort = process.argv[2];
@@ -72,7 +72,7 @@ class Blockchain{
         if( genesisBlock.previousBlockHash !== "0"
         || genesisBlock.hash !== "0"
         || genesisBlock.nonce !== 0
-        || genesisBlock.transactions.length !== 0 
+        || genesisBlock.transactions.length !== 0
         ){
             console.log("Invalid genesis block..");
             return false;

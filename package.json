@@ -4,13 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon --watch dev -e js dev/api.js 3000 http://127.0.0.1",
-    "start": "node dev/api.js 3000 http://127.0.0.1",
-    "node_1": "nodemon --watch dev -e js dev/api.js 3001 http://127.0.0.1",
-    "node_2": "nodemon --watch dev -e js dev/api.js 3002 http://127.0.0.1",
-    "node_3": "nodemon --watch dev -e js dev/api.js 3003 http://127.0.0.1",
-    "node_4": "nodemon --watch dev -e js dev/api.js 3004 http://127.0.0.1",
-    "node_5": "nodemon --watch dev -e js dev/api.js 3005 http://127.0.0.1"
+    "test": "nodemon --watch dev -e js api/api.js 3000 http://127.0.0.1",
+    "start": "node api/api.js 3000 http://127.0.0.1",
+    "node_1": "nodemon --watch dev -e js api/api.js 3001 http://127.0.0.1",
+    "node_2": "nodemon --watch dev -e js api/api.js 3002 http://127.0.0.1",
+    "node_3": "nodemon --watch dev -e js api/api.js 3003 http://127.0.0.1",
+    "node_4": "nodemon --watch dev -e js api/api.js 3004 http://127.0.0.1",
+    "node_5": "nodemon --watch dev -e js api/api.js 3005 http://127.0.0.1"
   },
   "author": "",
   "license": "ISC",
