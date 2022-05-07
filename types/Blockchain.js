@@ -99,6 +99,56 @@ class Blockchain{
         //Chain is valid
         return true;
     }
+
+    getBlockByBlockHash(blockHash){
+      if(blockHash === undefined || blockHash === null){
+        return null;
+      }
+      for(let i = 0; i < this.chain.length; i++){
+        const block = this.chain[i];
+        if(block.hash === blockHash){
+          return block;
+        }
+      }
+      return null;
+    }
+
+    getTransactionById(transactionId){
+      if(transactionId === undefined || transactionId === null){
+        return null;
+      }
+      for(let i = 0; i < this.chain.length; i++){
+        const block = this.chain[i];
+        for(let j = 0; j < block.transactions.length; j++){
+          const transaction = block.transactions[j];
+          if(transaction.transactionId === transactionId){
+            return transaction;
+          }
+        }
+      }
+      return null;
+    }
+
+    getTransactionsByAddress(address){
+      const resultTransactions = [];
+      let balance = 0;
+      this.chain.forEach(block => {
+        block.transactions.forEach(transaction => {
+          if(transaction.sender === address){
+            balance -= transaction.amount;
+            resultTransactions.push(transaction);
+          }
+          else if(transaction.recipient === address){
+            balance += transaction.amount;
+            resultTransactions.push(transaction);
+          }
+        });
+      });
+      return {
+        balance,
+        transactions: resultTransactions
+      };
+    }
 }
 
 module.exports = Blockchain;

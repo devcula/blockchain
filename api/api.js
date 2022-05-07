@@ -266,6 +266,34 @@ app.get("/consensus", async function(req, res){
     return res.status(200).send("Current chain has not been replaced..");
 });
 
+app.get("/block/:blockHash", function(req, res){
+  const { blockHash } = req.params;
+  console.log(`Request received at /block/:blockHash endpoint with block hash ${blockHash}`);
+  const block = newcoin.getBlockByBlockHash(blockHash);
+  if(block){
+    return res.status(200).send(block);
+  }
+  return res.status(404).send("Block not found with the given hash..");
+});
+
+app.get("/transaction/:transactionId", function(req, res){
+  const { transactionId } = req.params;
+  const transaction = newcoin.getTransactionById(transactionId);
+  if(transaction){
+    return res.status(200).send(transaction);
+  }
+  return res.status(404).send("Transaction not found with the given transactionId..");
+});
+
+app.get("/address/:address", function(req, res){
+  const {address} = req.params;
+  if(!address){
+    return res.status(400).send("Please pass a valid address..");
+  }
+  const allTransactions = newcoin.getTransactionsByAddress(address);
+  return res.status(200).send(allTransactions);
+});
+
 app.get("/validate-chain", function(req, res){
     //Just for testing purposes
     res.status(200).send(newcoin.isBlockchainValid(newcoin.chain));
