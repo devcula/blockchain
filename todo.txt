@@ -1,5 +1,6 @@
 Add transaction fees into each transaction.
 
+
 Instead of using pending transactions array for mining, compute merkel root.
 
 Declare API callback functions in separate file so that they can be used internally as well.
