@@ -1,9 +1,0 @@
-[user]
-email = devcula@outlook.com
-name = Abhishek Prasad
- 
-[github]
-user = “devcula”
- 
-[core]
-sshCommand = “ssh -i ~/.ssh/github.personal"
