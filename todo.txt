@@ -4,6 +4,4 @@ Instead of using pending transactions array for mining, compute merkel root.
 
 Declare API callback functions in separate file so that they can be used internally as well.
 
-Check if mining reward and transaction fees are part of the same block or they need to be mined separately.
-
 After registering and broadcasting a new network node, send the entire blockchain to the new node as well. (For this consensus algorithm can be used)
