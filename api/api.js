@@ -4,6 +4,7 @@ const app = express();
 const uuid = require('uuid');
 const axios = require('axios');
 const port = process.argv[2];
+const path = require("path");
 
 const nodeAddress = uuid.v1().split("-").join("");
 
@@ -292,6 +293,10 @@ app.get("/address/:address", function(req, res){
   }
   const allTransactions = newcoin.getTransactionsByAddress(address);
   return res.status(200).send(allTransactions);
+});
+
+app.get("/block-explorer", function(req, res){
+  res.sendFile("views/block-explorer.html", { root: "/Users/devcula/Workspace/blockchain/" });
 });
 
 app.get("/validate-chain", function(req, res){
