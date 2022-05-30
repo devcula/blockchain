@@ -17,3 +17,4 @@ Call consensus on a new node when it's registered on the network.
 Enhance blockchain explorer. By default show entire blockchain. Have search in a different tab. Try to make a common search.
 
 Check for available balance with the sender before creating a new transaction.
+
