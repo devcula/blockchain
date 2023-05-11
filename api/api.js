@@ -15,6 +15,10 @@ const newcoin = new Blockchain();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.get('/', function(req, res){
+    res.send('Working!');
+});
+
 app.get("/blockchain", function(req, res){
     res.send(newcoin);
 });
