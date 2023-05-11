@@ -4,7 +4,6 @@ const app = express();
 const uuid = require('uuid');
 const axios = require('axios');
 const port = process.argv[2];
-const path = require("path");
 
 const nodeAddress = uuid.v1().split("-").join("");
 
