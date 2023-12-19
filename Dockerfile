@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "test", "3000", "http://127.0.0.1"]
+CMD ["npm", "start"]
