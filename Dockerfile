@@ -1,16 +1,14 @@
-FROM node:16
+FROM node:18-alpine
 
 #Create app directory
-WORKDIR /usr/src/api
+WORKDIR /app
 
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
-
+# Copying package.json before copying the entire source to benefit from docker cache at npm install layer
+# So now basically only when package.json is modified, npm install will run again otherwise it will use from cache which is correct.
+# Reference https://docs.docker.com/build/guide/layers/
+COPY package.json .
 RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
 
 COPY . .
 
