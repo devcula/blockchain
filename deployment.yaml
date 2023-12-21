@@ -17,6 +17,21 @@ spec:
             -  name: blockchain-container
                image: blockchain
                imagePullPolicy: Never
+               readinessProbe:
+                  httpGet:
+                     path: /
+                     port: 3000
+                  initialDelaySeconds: 2
+                  periodSeconds: 1
+                  timeoutSeconds: 1
+                  successThreshold: 1
+                  failureThreshold: 10
+               resources:
+                  limits:
+                     memory: 200Mi
+                  requests:
+                     cpu: 200m
+                     memory: 200Mi
 ---
 apiVersion: v1
 kind: Service
