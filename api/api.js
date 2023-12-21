@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const uuid = require('uuid');
 const axios = require('axios');
-const port = process.argv[2];
+const port = process.env.PORT || 3000;
 
 const nodeAddress = uuid.v1().split("-").join("");
 
@@ -11,10 +11,13 @@ const Blockchain = require("../types/Blockchain");
 
 const newcoin = new Blockchain();
 
+let healthCheckCount = 0;   // Just to debug
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function(req, res){
+    console.log(`/ Health check count : ${++healthCheckCount}`);
     res.send('Working!');
 });
 

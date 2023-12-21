@@ -15,14 +15,39 @@ spec:
       spec:
          containers:
             -  name: blockchain-container
-               image: blockchain
+               image: blockchain:v3
                imagePullPolicy: Never
+               env:
+               -  name: PORT
+                  value: "3000"
                readinessProbe:
                   httpGet:
                      path: /
                      port: 3000
                   initialDelaySeconds: 2
-                  periodSeconds: 1
+                  periodSeconds: 2
+                  timeoutSeconds: 1
+                  successThreshold: 1
+                  failureThreshold: 10
+               resources:
+                  limits:
+                     memory: 200Mi
+                  requests:
+                     cpu: 200m
+                     memory: 200Mi
+            #Adding same container to test things
+            -  name: blockchain-container2
+               image: blockchain:v3
+               imagePullPolicy: Never
+               env:
+               -  name: PORT
+                  value: "3001"
+               readinessProbe:
+                  httpGet:
+                     path: /
+                     port: 3001
+                  initialDelaySeconds: 2
+                  periodSeconds: 2
                   timeoutSeconds: 1
                   successThreshold: 1
                   failureThreshold: 10
@@ -46,3 +71,8 @@ spec:
       - port: 3000
         targetPort: 3000
         nodePort: 30001
+        name: container-1
+      - port: 3001
+        targetPort: 3001
+        nodePort: 30002
+        name: container-2
