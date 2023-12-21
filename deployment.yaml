@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: blockchain-deployment
+   namespace: default
+spec:
+   replicas: 2
+   selector:
+      matchLabels:
+         bb: web
+   template:
+      metadata:
+         labels:
+            bb: web
+      spec:
+         containers:
+            -  name: blockchain-container
+               image: blockchain
+               imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+   name: blockchain-service
+   namespace: default
+spec:
+   type: NodePort
+   selector:
+      bb: web
+   ports:
+      - port: 3000
+        targetPort: 3000
+        nodePort: 30001
